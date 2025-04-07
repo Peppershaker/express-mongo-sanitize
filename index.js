@@ -107,7 +107,7 @@ function sanitize(target, options = {}) {
 function middleware(options = {}) {
   const hasOnSanitize = typeof options.onSanitize === 'function';
   return function (req, res, next) {
-    ['body', 'params', 'headers', 'query'].forEach(function (key) {
+    ['body', 'params', 'headers'].forEach(function (key) {
       if (req[key]) {
         const { target, isSanitized } = _sanitize(req[key], options);
         req[key] = target;
@@ -119,6 +119,24 @@ function middleware(options = {}) {
         }
       }
     });
+
+    if (req.query) {
+      const { target, isSanitized } = _sanitize(req.query, options);
+      if (isSanitized) {
+        Object.defineProperty(req, 'query', {
+          value: target,
+          writable: false,
+          configurable: true,
+          enumerable: true,
+        });
+        if (hasOnSanitize) {
+          options.onSanitize({
+            req,
+            key: 'query',
+          });
+        }
+      }
+    }
     next();
   };
 }

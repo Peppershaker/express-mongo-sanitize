@@ -20,10 +20,10 @@ const callTracker = () => {
 describe('Express Mongo Sanitize', function () {
   describe('Remove Data', function () {
     const app = express();
+    app.set('query parser', 'extended');
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
     app.use(sanitize());
-
     app.post('/body', function (req, res) {
       res.status(200).json({
         body: req.body,
@@ -244,6 +244,7 @@ describe('Express Mongo Sanitize', function () {
 
   describe('Preserve Data', function () {
     const app = express();
+    app.set('query parser', 'extended');
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
     app.use(
@@ -534,6 +535,7 @@ describe('Express Mongo Sanitize', function () {
     describe('prototype pollution', function () {
       const createApp = (options) => {
         const app = express();
+        app.set('query parser', 'extended');
         app.use(bodyParser.urlencoded({ extended: true }));
         app.use(bodyParser.json());
         app.use(sanitize(options));
@@ -798,6 +800,7 @@ describe('Express Mongo Sanitize', function () {
     it('should not call onSanitize if the object is valid', function (done) {
       const tracker = callTracker();
       const app = express();
+      app.set('query parser', 'extended');
       app.use(bodyParser.urlencoded({ extended: true }));
       app.use(bodyParser.json());
       app.use(
@@ -884,6 +887,7 @@ describe('Express Mongo Sanitize', function () {
         );
     });
   });
+
   describe('dryRun', function () {
     it('should not sanitized if the object has a malicious key', function (done) {
       const app = express();
@@ -1009,6 +1013,7 @@ describe('Express Mongo Sanitize', function () {
 describe('Express Mongo Sanitize, Dots included', function () {
   describe('Remove Data, Dots included', function () {
     const app = express();
+    app.set('query parser', 'extended');
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
     app.use(sanitize({ allowDots: true }));
@@ -1255,6 +1260,7 @@ describe('Express Mongo Sanitize, Dots included', function () {
 
   describe('Preserve Data, dots included', function () {
     const app = express();
+    app.set('query parser', 'extended');
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
     app.use(
@@ -1546,6 +1552,7 @@ describe('Express Mongo Sanitize, Dots included', function () {
     describe('prototype pollution', function () {
       const createApp = (options) => {
         const app = express();
+        app.set('query parser', 'extended');
         app.use(bodyParser.urlencoded({ extended: true }));
         app.use(bodyParser.json());
         app.use(sanitize(options));
@@ -1655,6 +1662,7 @@ describe('Express Mongo Sanitize, Dots included', function () {
   describe('Preserve Data: prohibited characters (dots included)', function () {
     it('should not allow data to be replaced with a `$`', function (done) {
       const app = express();
+      app.set('query parser', 'extended');
       app.use(bodyParser.urlencoded({ extended: true }));
       app.use(
         sanitize({

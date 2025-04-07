@@ -1,6 +1,8 @@
 # Express Mongo Sanitize
 
-Express 4.x middleware which sanitizes user-supplied data to prevent MongoDB Operator Injection.
+Express 5.x middleware which sanitizes user-supplied data to prevent MongoDB Operator Injection.
+
+For Express 4.x please use v2.2 of this package.
 
 [![Build Status](https://github.com/fiznool/express-mongo-sanitize/workflows/Node.js%20CI/badge.svg)](https://github.com/fiznool/express-mongo-sanitize/actions/workflows/nodejs.yml)
 [![npm version](https://img.shields.io/npm/v/express-mongo-sanitize)](https://www.npmjs.com/package/express-mongo-sanitize)
@@ -42,7 +44,7 @@ const bodyParser = require('body-parser');
 const mongoSanitize = require('express-mongo-sanitize');
 
 const app = express();
-
+app.set('query parser', 'extended');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -110,6 +112,24 @@ app.use(
 );
 ```
 
+### Sanitizing Nested Objects
+
+To sanitize nested objects in query strings, such as `/query?username[$gt]=foo&username[dotted.data]=some_data`, ensure that Express' `query parser` option is set to `extended`. This helps protect against nested query injection attacks through query parameters.
+
+If `replaceWith` is not set, the sanitized query parameter will appear as:
+
+```json
+{ "username": {} }
+```
+
+However, if using Express v5's default `simple` query parser, the query parameter will remain as:
+
+```json
+{ "username[$gt]": "foo" }
+```
+
+For sanitizing nested objects in the request body, configure `bodyParser.urlencoded({ extended: true })`.
+
 ### Node Modules API
 
 You can also bypass the middleware and use the module directly:
@@ -147,6 +167,10 @@ const hasProhibited = mongoSanitize.has(payload);
 // If the payload only has `.` it will return false (since it doesn't see the data with `.` as malicious)
 const hasProhibited = mongoSanitize.has(payload, true);
 ```
+
+### `req.query` Being Readonly in Express v5
+
+`req.query` is designed to be read only in Express v5; however, this middleware modifies `req.query`, which might be unexpected for some users.
 
 ## Contributing
 
